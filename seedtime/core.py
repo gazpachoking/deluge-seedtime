@@ -48,6 +48,7 @@ from deluge.core.rpcserver import export
 CONFIG_DEFAULT = {
     "default_stop_time": 7,
     "apply_stop_time": False,
+    "remove_torrent": False,
     "torrent_stop_times":{} # torrent_id: stop_time (in hours)
 }
 
@@ -83,14 +84,17 @@ class Core(CorePluginBase):
 
     def update_checker(self):
         """Check if any torrents have reached their stop seed time."""
-        for torrent in component.get("Core").torrentmanager.torrents.itervalues():
+        for torrent in component.get("Core").torrentmanager.torrents.values():
             if not torrent.torrent_id in self.torrent_stop_times:
                 continue
             stop_time = self.torrent_stop_times[torrent.torrent_id]
             log.debug('seedtime stop time %s' % stop_time)
             log.debug('seedtime torrent seeding time %r' % torrent.get_status(['seeding_time']))
             if torrent.get_status(['seeding_time'])['seeding_time'] > stop_time * 3600.0 * 24.0:
-                torrent.pause()
+                if self.config['remove_torrent']:
+                    self.torrent_manager.remove(torrent.torrent_id)
+                else:
+                    torrent.pause()
 
     ## Plugin hooks ##
     def post_torrent_add(self, torrent_id):

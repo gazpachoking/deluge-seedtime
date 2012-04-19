@@ -91,6 +91,7 @@ class GtkUI(GtkPluginBase):
         self.glade.get_widget("lbl_error").set_text("")
         config = {
             "apply_stop_time": self.glade.get_widget("chk_apply_stop_time").get_active(),
+            "remove_torrent": self.glade.get_widget("chk_remove_torrent").get_active(),
             "default_stop_time": stop_time
         }
         client.seedtime.set_config(config)
@@ -103,7 +104,8 @@ class GtkUI(GtkPluginBase):
         """callback for on show_prefs"""
         log.debug('cb get config seedtime')
         self.glade.get_widget("chk_apply_stop_time").set_active(config["apply_stop_time"])
-        self.glade.get_widget("txt_default_stop_time").set_text(str(config["default_stop_time"]))
+        self.glade.get_widget("chk_remove_torrent").set_active(config["remove_torrent"])
+        self.glade.get_widget("txt_default_stop_time").set_text('%.02f' % config["default_stop_time"])
 
 class SeedTimeMenu(gtk.MenuItem):
     def __init__(self):

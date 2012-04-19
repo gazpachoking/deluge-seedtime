@@ -19,32 +19,54 @@
                 <property name="draw_indicator">True</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="position">0</property>
               </packing>
             </child>
             <child>
               <widget class="GtkEntry" id="txt_default_stop_time">
+                <property name="width_request">50</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="invisible_char">&#x25CF;</property>
                 <signal name="editing_done" handler="on_edit_done"/>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="padding">5</property>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
               <widget class="GtkLabel" id="label3">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">days</property>
+                <property name="label" translatable="yes">days   (applies to all new torrents)</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="position">2</property>
               </packing>
             </child>
           </widget>
           <packing>
+            <property name="expand">False</property>
+            <property name="padding">3</property>
             <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkCheckButton" id="chk_remove_torrent">
+            <property name="label" translatable="yes">Remove torrent when stopping</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="xalign">0.50999999046325684</property>
+            <property name="draw_indicator">True</property>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="padding">3</property>
+            <property name="position">1</property>
           </packing>
         </child>
         <child>
@@ -53,7 +75,7 @@
             <property name="xalign">0.52999997138977051</property>
           </widget>
           <packing>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </widget>
