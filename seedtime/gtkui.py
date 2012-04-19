@@ -54,17 +54,28 @@ class GtkUI(GtkPluginBase):
         component.get("Preferences").add_page("SeedTime", self.glade.get_widget("prefs_box"))
         component.get("PluginManager").register_hook("on_apply_prefs", self.on_apply_prefs)
         component.get("PluginManager").register_hook("on_show_prefs", self.on_show_prefs)
+        # Columns
         torrentview = component.get("TorrentView")
         torrentview.add_func_column(_("Seed Time"), cell_data_time, [int], status_field=["seeding_time"])
         torrentview.add_func_column(_("Stop Seed Time"), cell_data_time, [int], status_field=["seed_stop_time"])
+        # Submenu
+        log.debug("add items to torrentview-popup menu.")
+        torrentmenu = component.get("MenuBar").torrentmenu
+        self.seedtime_menu = SeedTimeMenu()
+        torrentmenu.append(self.seedtime_menu)
+        self.seedtime_menu.show_all()
 
     def disable(self):
         component.get("Preferences").remove_page("SeedTime")
         component.get("PluginManager").deregister_hook("on_apply_prefs", self.on_apply_prefs)
         component.get("PluginManager").deregister_hook("on_show_prefs", self.on_show_prefs)
         try:
+            # Columns
             component.get("TorrentView").remove_column(_("Seed Time"))
             component.get("TorrentView").remove_column(_("Stop Seed Time"))
+            # Submenu
+            torrentmenu = component.get("MenuBar").torrentmenu
+            torrentmenu.remove(self.seedtime_menu)
         except Exception, e:
             log.debug(e)
 
@@ -93,3 +104,40 @@ class GtkUI(GtkPluginBase):
         log.debug('cb get config seedtime')
         self.glade.get_widget("chk_apply_stop_time").set_active(config["apply_stop_time"])
         self.glade.get_widget("txt_default_stop_time").set_text(str(config["default_stop_time"]))
+
+class SeedTimeMenu(gtk.MenuItem):
+    def __init__(self):
+        gtk.MenuItem.__init__(self, "Seed Stop Time")
+
+        self.sub_menu = gtk.Menu()
+        self.set_submenu(self.sub_menu)
+        self.items = []
+
+        #attach..
+        torrentmenu = component.get("MenuBar").torrentmenu
+        self.sub_menu.connect("show", self.on_show, None)
+
+    def get_torrent_ids(self):
+        return component.get("TorrentView").get_selected_torrents()
+
+    def on_show(self, widget=None, data=None):
+        try:
+            for child in self.sub_menu.get_children():
+                self.sub_menu.remove(child)
+            # TODO: Make thise times customizable, and/or add a custom popup
+            for time in (None, 1, 2, 3, 7, 14, 30):
+                if time is None:
+                    item = gtk.MenuItem('Never')
+                else:
+                    item = gtk.MenuItem(str(time) + ' days')
+                item.connect("activate", self.on_select_time, time)
+                self.sub_menu.append(item)
+            self.show_all()
+        except Exception, e:
+            log.exception('AHH!')
+
+    def on_select_time(self, widget=None, time=None):
+        log.debug("select seed stop time:%s,%s" % (time ,self.get_torrent_ids()) )
+        for torrent_id in self.get_torrent_ids():
+            client.seedtime.set_torrent(torrent_id, time)
+

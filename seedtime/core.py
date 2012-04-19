@@ -46,7 +46,7 @@ import deluge.configmanager
 from deluge.core.rpcserver import export
 
 CONFIG_DEFAULT = {
-    "default_stop_time": 48,
+    "default_stop_time": 7,
     "apply_stop_time": False,
     "torrent_stop_times":{} # torrent_id: stop_time (in hours)
 }
@@ -123,7 +123,10 @@ class Core(CorePluginBase):
 
     @export
     def set_torrent(self, torrent_id , stop_time):
-        self.torrent_stop_times[torrent_id] = stop_time
+        if stop_time is None:
+            del self.torrent_stop_times[torrent_id]
+        else:
+            self.torrent_stop_times[torrent_id] = stop_time
         self.config.save()
 
     def _status_get_seed_stop_time(self, torrent_id):
