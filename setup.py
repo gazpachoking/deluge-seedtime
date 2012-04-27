@@ -42,7 +42,7 @@ from setuptools import setup
 __plugin_name__ = "SeedTime"
 __author__ = "Chase Sterling"
 __author_email__ = "chase.sterling@gmail.com"
-__version__ = "0.3"
+__version__ = "0.4"
 __url__ = ""
 __license__ = "GPLv3"
 __description__ = ""

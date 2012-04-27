@@ -134,6 +134,9 @@ class SeedTimeMenu(gtk.MenuItem):
                     item = gtk.MenuItem(str(time) + ' days')
                 item.connect("activate", self.on_select_time, time)
                 self.sub_menu.append(item)
+            item = gtk.MenuItem('Custom')
+            item.connect('activate', self.on_custom_time)
+            self.sub_menu.append(item)
             self.show_all()
         except Exception, e:
             log.exception('AHH!')
@@ -143,3 +146,15 @@ class SeedTimeMenu(gtk.MenuItem):
         for torrent_id in self.get_torrent_ids():
             client.seedtime.set_torrent(torrent_id, time)
 
+    def on_custom_time(self, widget=None):
+        # Show the custom time dialog
+        glade = gtk.glade.XML(get_resource("config.glade"))
+        dlg = glade.get_widget('dlg_custom_time')
+        result = dlg.run()
+        if result == gtk.RESPONSE_OK:
+            time = glade.get_widget('txt_custom_stop_time').get_text()
+            try:
+                self.on_select_time(time=float(time))
+            except ValueError:
+                log.error('Invalid custom stop time entered.')
+        dlg.destroy()
