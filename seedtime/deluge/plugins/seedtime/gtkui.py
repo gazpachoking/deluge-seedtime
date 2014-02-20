@@ -43,7 +43,7 @@ from deluge.log import LOG as log
 from deluge.ui.client import client
 from deluge.plugins.pluginbase import GtkPluginBase
 import deluge.component as component
-from deluge.ui.gtkui.listview import cell_data_time
+from deluge.ui.gtkui.torrentview_data_funcs import cell_data_time
 
 from common import get_resource
 

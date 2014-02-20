@@ -39,4 +39,4 @@
 
 def get_resource(filename):
     import pkg_resources, os
-    return pkg_resources.resource_filename("seedtime", os.path.join("data", filename))
+    return pkg_resources.resource_filename("deluge.plugins.seedtime", os.path.join("data", filename))
