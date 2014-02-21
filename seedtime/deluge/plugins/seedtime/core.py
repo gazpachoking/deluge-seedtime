@@ -49,7 +49,7 @@ CONFIG_DEFAULT = {
     "default_stop_time": 7,
     "apply_stop_time": False,
     "remove_torrent": False,
-    "torrent_stop_times":{} # torrent_id: stop_time (in hours)
+    "torrent_stop_times": {}  # torrent_id: stop_time (in hours)
 }
 
 class Core(CorePluginBase):
@@ -71,8 +71,8 @@ class Core(CorePluginBase):
         deferLater(reactor, 5, self.start_looping)
 
     def start_looping(self):
-        log.warning('seedtime loop starting')
-        self.looping_call.start(5)
+        log.debug("seedtime loop starting")
+        self.looping_call.start(10)
 
     def disable(self):
         self.plugin.deregister_status_field("seed_stop_time")
@@ -85,13 +85,11 @@ class Core(CorePluginBase):
     def update_checker(self):
         """Check if any torrents have reached their stop seed time."""
         for torrent in component.get("Core").torrentmanager.torrents.values():
-            if not torrent.torrent_id in self.torrent_stop_times:
+            if not (torrent.state == "Seeding" and torrent.torrent_id in self.torrent_stop_times):
                 continue
             stop_time = self.torrent_stop_times[torrent.torrent_id]
-            log.debug('seedtime stop time %s' % stop_time)
-            log.debug('seedtime torrent seeding time %r' % torrent.get_status(['seeding_time']))
-            if torrent.get_status(['seeding_time'])['seeding_time'] > stop_time * 3600.0 * 24.0:
-                if self.config['remove_torrent']:
+            if torrent.get_status(["seeding_time"])["seeding_time"] > stop_time * 3600.0 * 24.0:
+                if self.config["remove_torrent"]:
                     self.torrent_manager.remove(torrent.torrent_id)
                 else:
                     torrent.pause()
@@ -100,22 +98,19 @@ class Core(CorePluginBase):
     def post_torrent_add(self, torrent_id):
         if not self.torrent_manager.session_started:
             return
-        log.debug("seedtime post_torrent_add")
         if self.config["apply_stop_time"]:
-            log.debug('applying stop.... time %r' % self.config['default_stop_time'])
+            log.debug("applying stop.... time %r" % self.config["default_stop_time"])
             self.set_torrent(torrent_id, self.config["default_stop_time"])
 
-
     def post_torrent_remove(self, torrent_id):
-        log.debug("seedtime post_torrent_remove")
         if torrent_id in self.torrent_stop_times:
             del self.torrent_stop_times[torrent_id]
 
     @export
     def set_config(self, config):
         """Sets the config dictionary"""
-        log.debug('seedtime %r' % config)
-        log.debug('component state %r, component timer %r' % (self._component_state, self._component_timer))
+        log.debug("seedtime %r" % config)
+        log.debug("component state %r, component timer %r" % (self._component_state, self._component_timer))
         for key in config.keys():
             self.config[key] = config[key]
         self.config.save()
@@ -126,7 +121,7 @@ class Core(CorePluginBase):
         return self.config.config
 
     @export
-    def set_torrent(self, torrent_id , stop_time):
+    def set_torrent(self, torrent_id, stop_time):
         if stop_time is None:
             del self.torrent_stop_times[torrent_id]
         else:
