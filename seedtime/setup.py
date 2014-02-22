@@ -42,10 +42,10 @@ from setuptools import setup, find_packages
 __plugin_name__ = "SeedTime"
 __author__ = "Chase Sterling"
 __author_email__ = "chase.sterling@gmail.com"
-__version__ = "0.5"
+__version__ = "1.0.dev1"
 __url__ = ""
 __license__ = "GPLv3"
-__description__ = "Allows setting torrents to automatically pause after seeding for a certain time."
+__description__ = "Allows pausing or removing torrents after seeding for a certain time."
 __long_description__ = __description__
 __pkg_data__ = {"deluge.plugins."+__plugin_name__.lower(): ["template/*", "data/*"]}
 
