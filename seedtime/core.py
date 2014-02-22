@@ -72,7 +72,7 @@ class Core(CorePluginBase):
 
     def start_looping(self):
         log.warning('seedtime loop starting')
-        self.looping_call.start(5)
+        self.looping_call.start(10)
 
     def disable(self):
         self.plugin.deregister_status_field("seed_stop_time")
@@ -85,11 +85,9 @@ class Core(CorePluginBase):
     def update_checker(self):
         """Check if any torrents have reached their stop seed time."""
         for torrent in component.get("Core").torrentmanager.torrents.values():
-            if not torrent.torrent_id in self.torrent_stop_times:
+            if not (torrent.state == "Seeding" and torrent.torrent_id in self.torrent_stop_times):
                 continue
             stop_time = self.torrent_stop_times[torrent.torrent_id]
-            log.debug('seedtime stop time %s' % stop_time)
-            log.debug('seedtime torrent seeding time %r' % torrent.get_status(['seeding_time']))
             if torrent.get_status(['seeding_time'])['seeding_time'] > stop_time * 3600.0 * 24.0:
                 if self.config['remove_torrent']:
                     self.torrent_manager.remove(torrent.torrent_id)
