@@ -98,8 +98,6 @@ class Core(CorePluginBase):
     def post_torrent_add(self, torrent_id, from_state):
         if from_state:
             return
-        if not self.torrent_manager.session_started:
-            return
         if self.config["apply_stop_time"]:
             log.debug("applying stop.... time %r" % self.config["default_stop_time"])
             self.set_torrent(torrent_id, self.config["default_stop_time"])
